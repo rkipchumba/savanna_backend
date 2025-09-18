@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Savannah{% endblock %}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      nav {
+        background: #2c3e50;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      nav .nav-left a {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      nav .nav-links a {
+        color: white;
+        text-decoration: none;
+        margin-left: 15px;
+        font-size: 16px;
+      }
+
+      nav .nav-links a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 0 15px;
+      }
+
+      h1,
+      h2 {
+        color: #2c3e50;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-left">
+        <a href="/">Savannah</a>
+      </div>
+      <div class="nav-links">
+        <a href="/products/">Products</a>
+        {% if user.is_authenticated %}
+        <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">
+            Logout
+          </button>
+        </form>
+        {% else %}
+        <a href="{% url 'account_login' %}">Login</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="container">{% block content %}
+  <p class="welcome">Welcome, <strong>{{ user.username }}</strong> 👋</p>
+        
+        {% endblock %}</div>
+  </body>
+</html>

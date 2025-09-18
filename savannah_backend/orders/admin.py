@@ -1,11 +1,10 @@
 from django.contrib import admin
-from django.utils.html import format_html, format_html_join
 from .models import Order, OrderItem
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    extra = 0
-    readonly_fields = ('product', 'get_price', 'quantity', 'subtotal')
+    extra = 1
+    readonly_fields = ('get_price', 'subtotal')  # keep only computed fields read-only
 
     def get_price(self, obj):
         return obj.product.price

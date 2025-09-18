@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from django.db.models import Avg
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
+from django.shortcuts import render
+
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -37,3 +39,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+def product_list(request):
+    products = Product.objects.select_related("category").all()
+    return render(request, "products/list.html", {"products": products})
