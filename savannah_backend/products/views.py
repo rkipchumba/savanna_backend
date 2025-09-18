@@ -1,3 +1,39 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.db.models import Avg
+from .models import Category, Product
+from .serializers import CategorySerializer, ProductSerializer
 
-# Create your views here.
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    @action(detail=True, methods=['get'])
+    def average_price(self, request, pk=None):
+        """Return average price including all child categories."""
+        category = self.get_object()
+
+        categories = [category]
+        children = list(category.children.all())
+        while children:
+            next_children = []
+            for c in children:
+                categories.append(c)
+                next_children.extend(list(c.children.all()))
+            children = next_children
+
+        products = Product.objects.filter(category__in=categories)
+        avg_price = products.aggregate(avg_price=Avg('price'))['avg_price']
+        avg_price = round(avg_price, 2) if avg_price else 0
+
+        return Response({
+            "category": category.name,
+            "average_price": avg_price
+        })
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
