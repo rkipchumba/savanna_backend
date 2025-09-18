@@ -10,6 +10,10 @@ SECRET_KEY = 'django-insecure-(63rurtw#p9#tz#8%9^n=vi^8h=+6e8yz003cagxswo$3=fqsr
 DEBUG = True
 ALLOWED_HOSTS = []
 
+AT_USERNAME = "sandbox"
+AT_API_KEY = "atsk_41d54ddca591d738d1867c2e4aea34884937e17405ef9c08e1cbef8b775a83ae02a7756b"
+
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',

@@ -28,6 +28,6 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),  
 
     path("products/", include("products.urls")),
-    
+    path("orders/", include("orders.urls")),
 
 ]
