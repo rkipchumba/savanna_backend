@@ -3,16 +3,39 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from utils.notifications import send_sms
 from django.core.mail import send_mail
 from django.conf import settings
+from django.views.decorators.http import require_POST
 
 
 from .models import Order, OrderItem
 from .serializers import OrderSerializer
 from customers.models import Customer
 from products.models import Product
+
+@require_POST
+def checkout(request):
+    """
+    Marks the user's pending order as completed.
+    Triggers post_save signals for notifications.
+    """
+    if not request.user.is_authenticated:
+        return redirect("login")  # Redirect anonymous users to login
+
+    customer = request.user.customer_profile
+    order = Order.objects.filter(customer=customer, status="pending").first()
+
+    if not order:
+        # No pending order
+        return redirect("cart_view")
+
+    # Mark order as completed
+    order.status = "completed"
+    order.save()  # This triggers your post_save signal for notifications
+
+    return render(request, "orders/order_success.html", {"order": order})
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -134,3 +157,41 @@ Savannah Backend
         send_sms(customer.phone, message)
 
     return Response({"message": f"Order {order.id} placed successfully", "total": total})
+
+@require_POST
+def add_to_cart(request):
+    if not request.user.is_authenticated:
+        return redirect("account_login")
+
+    product_id = request.POST.get("product_id")
+    quantity = int(request.POST.get("quantity", 1))
+
+    product = get_object_or_404(Product, id=product_id)
+    customer = request.user.customer_profile
+
+    # Only get/create a pending order
+    order, created = Order.objects.get_or_create(customer=customer, status="pending")
+
+    # Add/update the item in the order
+    order_item, item_created = OrderItem.objects.get_or_create(
+        order=order,
+        product=product,
+        defaults={"quantity": quantity}
+    )
+
+    if not item_created:
+        order_item.quantity += quantity
+        order_item.save()
+
+    return redirect("cart_view")
+
+def cart_view(request):
+    if not request.user.is_authenticated:
+        return redirect("account_login")
+
+    customer = request.user.customer_profile
+    order = Order.objects.filter(customer=customer, status="pending").first()
+    items = order.items.all() if order else []
+    total = sum(item.product.price * item.quantity for item in items) if order else 0
+
+    return render(request, "orders/cart.html", {"items": items, "total": total})

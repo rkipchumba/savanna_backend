@@ -1,0 +1,41 @@
+<h2>Your Cart</h2>
+
+{% if items %}
+<table>
+  <tr>
+    <th>Product</th>
+    <th>Quantity</th>
+    <th>Price</th>
+    <th>Subtotal</th>
+  </tr>
+  {% for item in items %}
+  {% for item in items %}
+  <tr>
+    <td>{{ item.product.name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>{{ item.subtotal }}</td>
+  </tr>
+{% endfor %}
+<tr>
+  <td colspan="2">Total</td>
+  <td>{{ total }}</td>
+</tr>
+
+  {% endfor %}
+</table>
+
+<p>Total: Ksh {{ total }}</p>
+
+<form method="POST" action="{% url 'checkout' %}">
+  {% csrf_token %}
+  <button type="submit">Place Order</button>
+</form>
+
+<form action="{% url 'checkout' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Checkout</button>
+  </form>
+  
+{% else %}
+<p>Your cart is empty.</p>
+{% endif %}

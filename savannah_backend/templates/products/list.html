@@ -65,10 +65,17 @@
       {% if category.products %}
         <div class="products-container">
           {% for product in category.products %}
-            <div class="product-card">
-              <div class="product-title">{{ product.name }}</div>
-              <div class="product-price">Ksh {{ product.price }}</div>
-            </div>
+          <div class="product-card">
+            <div class="product-title">{{ product.name }}</div>
+            <div class="product-price">Ksh {{ product.price }}</div>
+          
+            <form class="add-to-cart-form" method="POST" action="{% url 'add_to_cart' %}">
+              {% csrf_token %}
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <input type="number" name="quantity" value="1" min="1" style="width: 60px;">
+              <button type="submit">Add to Cart</button>
+            </form>
+          </div>          
           {% endfor %}
         </div>
       {% else %}

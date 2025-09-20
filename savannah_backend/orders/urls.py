@@ -1,16 +1,16 @@
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path("place/<int:product_id>/", views.place_order, name="place_order"),
-]
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import OrderViewSet
+from . import views
 
 router = DefaultRouter()
-router.register(r'', OrderViewSet, basename='order')
+router.register(r'', views.OrderViewSet, basename='order')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    # DRF router for API
+    path('api/', include(router.urls)),
+
+    # Your frontend/cart views
+    path("cart/", views.cart_view, name="cart_view"),
+    path("add-to-cart/", views.add_to_cart, name="add_to_cart"),
+    path("checkout/", views.checkout, name="checkout"),
 ]

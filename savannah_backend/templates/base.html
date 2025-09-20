@@ -33,10 +33,23 @@
         text-decoration: none;
         margin-left: 15px;
         font-size: 16px;
+        position: relative;
       }
 
       nav .nav-links a:hover {
         text-decoration: underline;
+      }
+
+      .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -12px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+        font-weight: bold;
       }
 
       .container {
@@ -58,22 +71,43 @@
       </div>
       <div class="nav-links">
         <a href="/products/">Products</a>
+    
         {% if user.is_authenticated %}
+        <a href="{% url 'cart_view' %}" style="position: relative; display: inline-block;">
+            🛒 Cart
+            {% with request.user.customer_profile.orders.first.items.count as cart_count %}
+                {% if cart_count %}
+                    <span style="
+                        position: absolute;
+                        top: -8px;
+                        right: -10px;
+                        background: red;
+                        color: white;
+                        border-radius: 50%;
+                        padding: 2px 6px;
+                        font-size: 12px;
+                    ">{{ cart_count }}</span>
+                {% endif %}
+            {% endwith %}
+        </a>
+    
         <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">
-            Logout
-          </button>
+            {% csrf_token %}
+            <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">
+                Logout
+            </button>
         </form>
         {% else %}
         <a href="{% url 'account_login' %}">Login</a>
         {% endif %}
-      </div>
+    </div>
+    
     </nav>
 
-    <div class="container">{% block content %}
-  <p class="welcome">Welcome, <strong>{{ user.username }}</strong> 👋</p>
-        
-        {% endblock %}</div>
+    <div class="container">
+      {% block content %}
+        <p class="welcome">Welcome, <strong>{{ user.username }}</strong> 👋</p>
+      {% endblock %}
+    </div>
   </body>
 </html>
