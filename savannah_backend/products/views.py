@@ -41,5 +41,23 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
 def product_list(request):
-    products = Product.objects.select_related("category").all()
-    return render(request, "products/list.html", {"products": products})
+    # Get all top-level categories
+    categories = Category.objects.filter(parent=None).prefetch_related('children', 'products')
+    
+    category_data = []
+
+    for category in categories:
+        for child in category.children.all():
+            # Compute average price for this category including its children
+            all_products = Product.objects.filter(category__in=[child])
+            avg_price = all_products.aggregate(avg_price=Avg('price'))['avg_price'] or 0
+            avg_price = round(avg_price, 2)
+
+            category_data.append({
+                "id": child.id,
+                "name": child.name,
+                "products": child.products.all(),
+                "average_price": avg_price,
+            })
+
+    return render(request, "products/list.html", {"categories": category_data})
