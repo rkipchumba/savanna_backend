@@ -29,5 +29,6 @@ urlpatterns = [
 
     path("products/", include("products.urls")),
     path("orders/", include("orders.urls")),
+    path("test-sms/", views.test_sms, name="test_sms"),
 
 ]

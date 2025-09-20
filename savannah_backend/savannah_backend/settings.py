@@ -18,7 +18,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 AT_USERNAME = "sandbox"
-AT_API_KEY = "atsk_41d54ddca591d738d1867c2e4aea34884937e17405ef9c08e1cbef8b775a83ae02a7756b"
+AT_API_KEY = "atsk_ee8686925336242625cb7455e1a780838508c71cbceca1364e521cb5ca2c6151d71553f0"
 
 
 # Application definition
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     # My apps
     'customers',
     'products',
-    'orders',
+    'orders.apps.OrdersConfig',
 ]
 
 MIDDLEWARE = [
@@ -144,4 +144,11 @@ GOOGLE_CALLBACK_URL = "http://127.0.0.1:8000/auth/google/callback/"
 LOGIN_REDIRECT_URL = '/products/'  
 LOGOUT_REDIRECT_URL = '/products/'
 
-
+# Email configuration
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "kipchumbarodgers@gmail.com"
+EMAIL_HOST_PASSWORD = "trzk fnpx lykr zudo"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
