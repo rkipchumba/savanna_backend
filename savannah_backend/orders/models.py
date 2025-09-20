@@ -7,7 +7,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Order {self.id} by {self.customer.name}"
+        # Use the User model's full name or username
+        return f"Order {self.id} by {self.customer.user.get_full_name() or self.customer.user.username}"
 
     @property
     def total_price(self):
