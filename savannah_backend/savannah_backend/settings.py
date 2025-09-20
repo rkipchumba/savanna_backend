@@ -3,8 +3,15 @@ Django settings for savannah_backend project.
 """
 
 from pathlib import Path
+import warnings
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+warnings.filterwarnings(
+    "ignore",
+    message=".*app_settings.(USERNAME_REQUIRED|EMAIL_REQUIRED) is deprecated.*"
+)
 
 SECRET_KEY = 'django-insecure-(63rurtw#p9#tz#8%9^n=vi^8h=+6e8yz003cagxswo$3=fqsr'
 DEBUG = True
@@ -100,9 +107,11 @@ REST_FRAMEWORK = {
 
 # Django Allauth settings
 SITE_ID = 1
-ACCOUNT_EMAIL_VERIFICATION = "none"   # can be "mandatory" if we want
-ACCOUNT_AUTHENTICATION_METHOD = "username"
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"   # or "mandatory" if you need email checks
+
+ACCOUNT_LOGIN_METHODS = {"username"}  
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
 
 # Tell dj-rest-auth to use allauth
 REST_AUTH_SERIALIZERS = {
