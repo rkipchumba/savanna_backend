@@ -32,10 +32,10 @@
         </a>      
         <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
           {% csrf_token %}
-          <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">
+          <button type="submit" style="background:none; border:none; color:white; cursor:pointer;" onclick="sessionStorage.removeItem('cartCount');">
             Logout
           </button>
-        </form>
+        </form>        
       {% else %}
         <a href="{% url 'account_login' %}">Login</a>
         <a href="{% url 'account_signup' %}">Sign Up</a>
@@ -62,11 +62,21 @@
 
   function updateCartBadge(count) {
     const cartCount = document.getElementById('cart-count');
-    if(cartCount) {
+    if(cartCount){
       cartCount.textContent = count;
-      sessionStorage.setItem('cartCount', count);
+      sessionStorage.setItem('cartCount', count); // optional backup
     }
-  }
+  }  
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Clear cart count when a user logs in or out
+    sessionStorage.removeItem('cartCount');
+  
+    // Load current user's cart count
+    fetch("{% url 'cart_count' %}")
+      .then(res => res.json())
+      .then(data => updateCartBadge(data.cart_count));
+  });  
 
   async function addToCart(form) {
     const formData = new FormData(form);
