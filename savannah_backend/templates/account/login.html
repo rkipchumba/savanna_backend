@@ -4,76 +4,90 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="login-container">
-  <h2>Login</h2>
+<div class="auth-container">
+  <h2>Welcome Back</h2>
 
   <!-- Email/Password login -->
-  <form method="post" action="{% url 'account_login' %}" class="login-form">
+  <form method="post" action="{% url 'account_login' %}" class="auth-form">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn">Login</button>
+    <button type="submit" class="btn-primary">Login</button>
   </form>
 
   <div class="divider">OR</div>
 
   <!-- Google login -->
-  <a href="{% provider_login_url 'google' %}" class="google-btn">
+  <a href="{% provider_login_url 'google' %}" class="btn-google">
+    <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" class="google-icon">
     Login with Google
   </a>
+
+  <p class="switch-auth">Don't have an account? <a href="{% url 'account_signup' %}">Sign Up</a></p>
 </div>
 
 <style>
-  .login-container {
-      max-width: 400px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-  }
+.auth-container {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+.auth-container:hover { transform: translateY(-2px); }
 
-  .login-form {
-      text-align: left;
-  }
+.auth-container h2 {
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-weight: 600;
+}
 
-  .login-form p {
-      margin-bottom: 15px;
-  }
+.auth-form { text-align: left; }
+.auth-form p { margin-bottom: 15px; }
 
-  .btn {
-      width: 100%;
-      padding: 10px;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-  }
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #2c3e50;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s ease;
+}
+.btn-primary:hover { background: #1a252f; }
 
-  .btn:hover {
-      background: #1a252f;
-  }
+.divider {
+    margin: 20px 0;
+    font-weight: bold;
+    color: #888;
+}
 
-  .divider {
-      margin: 20px 0;
-      font-weight: bold;
-      color: #888;
-  }
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background: #db4437;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: background 0.2s ease;
+}
+.btn-google:hover { background: #c23321; }
 
-  .google-btn {
-      display: block;
-      padding: 10px;
-      background: #db4437;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-size: 16px;
-  }
+.google-icon { width: 20px; height: 20px; }
 
-  .google-btn:hover {
-      background: #c23321;
-  }
+.switch-auth {
+    margin-top: 20px;
+    font-size: 14px;
+}
+.switch-auth a { color: #2c3e50; font-weight: 500; text-decoration: none; }
+.switch-auth a:hover { text-decoration: underline; }
 </style>
 {% endblock %}

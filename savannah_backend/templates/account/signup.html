@@ -4,17 +4,89 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-<h2>Sign Up</h2>
+<div class="auth-container">
+  <h2>Create Account</h2>
 
-<form method="post" action="{% url 'account_signup' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Sign Up</button>
-</form>
+  <form method="post" action="{% url 'account_signup' %}" class="auth-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn-primary">Sign Up</button>
+  </form>
 
-<hr>
-<!-- Google signup -->
-<a href="{% provider_login_url 'google' %}">Sign Up with Google</a>
+  <div class="divider">OR</div>
 
-<p>Already have an account? <a href="{% url 'account_login' %}">Login here</a></p>
+  <a href="{% provider_login_url 'google' %}" class="btn-google">
+    <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" class="google-icon">
+    Sign Up with Google
+  </a>
+
+  <p class="switch-auth">Already have an account? <a href="{% url 'account_login' %}">Login here</a></p>
+</div>
+
+<style>
+/* Same styling as login.html for consistency */
+.auth-container {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+.auth-container:hover { transform: translateY(-2px); }
+
+.auth-container h2 {
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.auth-form { text-align: left; }
+.auth-form p { margin-bottom: 15px; }
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #2c3e50;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s ease;
+}
+.btn-primary:hover { background: #1a252f; }
+
+.divider {
+    margin: 20px 0;
+    font-weight: bold;
+    color: #888;
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background: #db4437;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: background 0.2s ease;
+}
+.btn-google:hover { background: #c23321; }
+
+.google-icon { width: 20px; height: 20px; }
+
+.switch-auth {
+    margin-top: 20px;
+    font-size: 14px;
+}
+.switch-auth a { color: #2c3e50; font-weight: 500; text-decoration: none; }
+.switch-auth a:hover { text-decoration: underline; }
+</style>
 {% endblock %}
