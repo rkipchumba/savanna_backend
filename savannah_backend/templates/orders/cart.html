@@ -45,7 +45,18 @@ async function updateCart(itemId, quantity) {
     headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
     body: JSON.stringify({item_id: itemId, quantity})
   });
-  return await response.json();
+  const data = await response.json();
+  if (data.success) {
+    // Update subtotal and total
+    const row = document.querySelector(`tr[data-item-id='${itemId}']`);
+    row.querySelector('.subtotal').textContent = 'Ksh ' + data.subtotal;
+    document.getElementById('cart-total').textContent = data.total;
+
+    // Update global cart count
+    const cartCount = document.getElementById('cart-count');
+    if(cartCount) cartCount.textContent = data.cart_count;
+  }
+  return data;
 }
 
 async function removeCart(itemId) {
@@ -54,7 +65,16 @@ async function removeCart(itemId) {
     headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
     body: JSON.stringify({item_id: itemId})
   });
-  return await response.json();
+  const data = await response.json();
+  if (data.success) {
+    document.querySelector(`tr[data-item-id='${itemId}']`).remove();
+    document.getElementById('cart-total').textContent = data.total;
+
+    // Update global cart count
+    const cartCount = document.getElementById('cart-count');
+    if(cartCount) cartCount.textContent = data.cart_count;
+  }
+  return data;
 }
 
 // Handle increment/decrement buttons

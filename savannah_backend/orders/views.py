@@ -193,17 +193,42 @@ def update_cart(request):
 
     order = item.order
     total = sum(i.product.price * i.quantity for i in order.items.all())
+    cart_count = order.items.count()
 
     return JsonResponse({
         "success": True,
         "subtotal": int(item.product.price * item.quantity),
-        "total": int(total)
+        "total": int(total),
+        "cart_count": cart_count  # <-- add this
     })
 
 
 @csrf_exempt
 @require_POST
 def remove_cart_item(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "not_authenticated"}, status=401)
+
+    data = json.loads(request.body)
+    item_id = data.get("item_id")
+    item = get_object_or_404(
+        OrderItem,
+        id=item_id,
+        order__customer=request.user.customer_profile,
+        order__status="pending"
+    )
+    order = item.order
+    item.delete()
+
+    total = sum(i.product.price * i.quantity for i in order.items.all())
+    cart_count = order.items.count()
+
+    return JsonResponse({
+        "success": True,
+        "total": int(total),
+        "cart_count": cart_count  # <-- add this
+    })
+
     if not request.user.is_authenticated:
         return JsonResponse({"error": "not_authenticated"}, status=401)
 

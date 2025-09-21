@@ -98,6 +98,7 @@
         <a href="{% url 'cart_view' %}" style="position: relative; display: inline-block;">
           🛒 Cart <span id="cart-count" class="cart-badge">{% if cart_item_count %}{{ cart_item_count }}{% else %}0{% endif %}</span>
         </a>
+        
         <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
             {% csrf_token %}
             <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">
