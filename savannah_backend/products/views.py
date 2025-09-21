@@ -51,12 +51,20 @@ def product_list(request):
             # Compute average price for this category including its children
             all_products = Product.objects.filter(category__in=[child])
             avg_price = all_products.aggregate(avg_price=Avg('price'))['avg_price'] or 0
-            avg_price = round(avg_price, 2)
+
+            # Truncate decimal by converting to int
+            avg_price = int(avg_price)
+
+            # Truncate individual product prices
+            products = []
+            for product in child.products.all():
+                product.price = int(product.price)
+                products.append(product)
 
             category_data.append({
                 "id": child.id,
                 "name": child.name,
-                "products": child.products.all(),
+                "products": products,
                 "average_price": avg_price,
             })
 

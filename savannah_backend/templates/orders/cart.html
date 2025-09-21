@@ -1,34 +1,109 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Your Cart</h2>
+<h2>Your Cart</h2>
 
-  {% if items %}
-    <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
-      <tr>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Subtotal</th>
-      </tr>
-      {% for item in items %}
-      <tr>
-        <td>{{ item.product.name }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>Ksh {{ item.subtotal }}</td>
-      </tr>
-      {% endfor %}
-      <tr>
-        <td colspan="2"><strong>Total</strong></td>
-        <td><strong>Ksh {{ total }}</strong></td>
-      </tr>
-    </table>
+{% if items %}
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+  <tr>
+    <th>Product</th>
+    <th>Quantity</th>
+    <th>Subtotal</th>
+    <th>Action</th>
+  </tr>
+  {% for item in items %}
+  <tr data-item-id="{{ item.id }}">
+    <td>{{ item.product.name }}</td>
+    <td>
+      <button class="decrement-btn">-</button>
+      <input type="number" value="{{ item.quantity }}" min="1" class="quantity-input" style="width: 50px; text-align:center;">
+      <button class="increment-btn">+</button>
+    </td>
+    <td class="subtotal">Ksh {{ item.subtotal_int }}</td>
+    <td>
+      <button class="remove-btn">Remove</button>
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td colspan="2"><strong>Total</strong></td>
+    <td colspan="2"><strong>Ksh <span id="cart-total">{{ total }}</span></strong></td>
+  </tr>
+</table>
 
-    <form method="POST" action="{% url 'checkout' %}" style="margin-top: 20px;">
-      {% csrf_token %}
-      <button type="submit">Place Order</button>
-    </form>
+<form method="POST" action="{% url 'checkout' %}" style="margin-top: 20px;">
+  {% csrf_token %}
+  <button type="submit">Place Order</button>
+</form>
 
-  {% else %}
-    <p>Your cart is empty.</p>
-  {% endif %}
+<script>
+const csrfToken = '{{ csrf_token }}';
+
+async function updateCart(itemId, quantity) {
+  const response = await fetch("{% url 'update_cart' %}", {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+    body: JSON.stringify({item_id: itemId, quantity})
+  });
+  return await response.json();
+}
+
+async function removeCart(itemId) {
+  const response = await fetch("{% url 'remove_cart_item' %}", {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+    body: JSON.stringify({item_id: itemId})
+  });
+  return await response.json();
+}
+
+// Handle increment/decrement buttons
+document.querySelectorAll('tr[data-item-id]').forEach(row => {
+  const itemId = row.dataset.itemId;
+  const input = row.querySelector('.quantity-input');
+  const subtotalCell = row.querySelector('.subtotal');
+
+  row.querySelector('.increment-btn').addEventListener('click', async () => {
+    input.value = parseInt(input.value) + 1;
+    const data = await updateCart(itemId, input.value);
+    if(data.success){
+      subtotalCell.textContent = 'Ksh ' + data.subtotal;
+      document.getElementById('cart-total').textContent = data.total;
+    }
+  });
+
+  row.querySelector('.decrement-btn').addEventListener('click', async () => {
+    if(parseInt(input.value) > 1){
+      input.value = parseInt(input.value) - 1;
+      const data = await updateCart(itemId, input.value);
+      if(data.success){
+        subtotalCell.textContent = 'Ksh ' + data.subtotal;
+        document.getElementById('cart-total').textContent = data.total;
+      }
+    }
+  });
+
+  row.querySelector('.remove-btn').addEventListener('click', async () => {
+    const data = await removeCart(itemId);
+    if(data.success){
+      row.remove();
+      document.getElementById('cart-total').textContent = data.total;
+    }
+  });
+
+  // Also update on manual input change
+  input.addEventListener('change', async () => {
+    if(parseInt(input.value) < 1) input.value = 1;
+    const data = await updateCart(itemId, input.value);
+    if(data.success){
+      subtotalCell.textContent = 'Ksh ' + data.subtotal;
+      document.getElementById('cart-total').textContent = data.total;
+    }
+  });
+});
+</script>
+
+{% else %}
+<p>Your cart is empty.</p>
+{% endif %}
 {% endblock %}

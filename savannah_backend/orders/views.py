@@ -1,5 +1,7 @@
+import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
@@ -14,6 +16,8 @@ from .serializers import OrderSerializer
 from customers.models import Customer
 from products.models import Product
 from utils.notifications import send_sms
+
+
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -57,8 +61,16 @@ def cart_view(request):
 
     customer = request.user.customer_profile
     order = Order.objects.filter(customer=customer, status="pending").first()
-    items = order.items.all() if order else []
-    total = sum(item.product.price * item.quantity for item in items) if order else 0
+    items = []
+    total = 0
+
+    if order:
+        for item in order.items.all():
+            subtotal = int(item.product.price * item.quantity)  # truncate decimal
+            total += subtotal
+            # attach truncated subtotal to item for template
+            item.subtotal_int = subtotal
+            items.append(item)
 
     return render(request, "orders/cart.html", {"items": items, "total": total})
 
@@ -158,3 +170,57 @@ def place_order(request):
         send_sms(customer.phone, message)
 
     return Response({"message": f"Order {order.id} placed successfully", "total": total})
+
+
+@csrf_exempt
+@require_POST
+def update_cart(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "not_authenticated"}, status=401)
+
+    data = json.loads(request.body)
+    item_id = data.get("item_id")
+    quantity = int(data.get("quantity", 1))
+
+    item = get_object_or_404(
+        OrderItem,
+        id=item_id,
+        order__customer=request.user.customer_profile,
+        order__status="pending"
+    )
+    item.quantity = quantity
+    item.save()
+
+    order = item.order
+    total = sum(i.product.price * i.quantity for i in order.items.all())
+
+    return JsonResponse({
+        "success": True,
+        "subtotal": int(item.product.price * item.quantity),
+        "total": int(total)
+    })
+
+
+@csrf_exempt
+@require_POST
+def remove_cart_item(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "not_authenticated"}, status=401)
+
+    data = json.loads(request.body)
+    item_id = data.get("item_id")
+    item = get_object_or_404(
+        OrderItem,
+        id=item_id,
+        order__customer=request.user.customer_profile,
+        order__status="pending"
+    )
+    order = item.order
+    item.delete()
+
+    total = sum(i.product.price * i.quantity for i in order.items.all())
+
+    return JsonResponse({
+        "success": True,
+        "total": int(total)
+    })
