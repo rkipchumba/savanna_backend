@@ -1,100 +1,100 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <style>
-    .category-container {
-      margin-bottom: 40px;
-    }
+<style>
+  .category-container {
+    margin-bottom: 40px;
+  }
 
-    .category-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: #34495e;
-    }
+  .category-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #34495e;
+  }
 
-    .category-average {
-      font-size: 16px;
-      margin-bottom: 15px;
-      color: #2980b9;
-    }
+  .category-average {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #2980b9;
+  }
 
-    .products-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-    }
+  .products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
 
-    .product-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 15px;
-      background: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+  .product-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    .product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
-    }
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+  }
 
-    .product-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #2c3e50;
-    }
+  .product-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c3e50;
+  }
 
-    .product-price {
-      font-size: 16px;
-      font-weight: bold;
-      color: #27ae60;
-      margin-bottom: 6px;
-    }
+  .product-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #27ae60;
+    margin-bottom: 6px;
+  }
 
-    .product-card button {
-      background-color: #27ae60;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+  .product-card button {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
 
-    .product-card button:hover {
-      background-color: #219150;
-    }
-  </style>
+  .product-card button:hover {
+    background-color: #219150;
+  }
+</style>
 
-  <h1>Products by Category</h1>
-  <p class="welcome">Welcome, <strong>{{ user.username }}</strong> 👋</p>
+<h1>Products by Category</h1>
+<p class="welcome">Welcome, <strong>{{ user.username }}</strong> 👋</p>
 
-  {% for category in categories %}
-    <div class="category-container">
-      <div class="category-title">{{ category.name }}</div>
-      <div class="category-average">Average Price: Ksh {{ category.average_price }}</div>
+{% for category in categories %}
+  <div class="category-container">
+    <div class="category-title">{{ category.name }}</div>
+    <div class="category-average">Average Price: Ksh {{ category.average_price }}</div>
 
-      {% if category.products %}
-        <div class="products-container">
-          {% for product in category.products %}
-            <div class="product-card">
-              <div class="product-title">{{ product.name }}</div>
-              <div class="product-price">Ksh {{ product.price }}</div>
-              
-              <form class="add-to-cart-form" method="POST" action="{% url 'add_to_cart' %}">
-                {% csrf_token %}
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-                <input type="number" name="quantity" value="1" min="1" style="width: 60px;">
-                <button type="submit">Add to Cart</button>
-              </form>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p>No products available in this category.</p>
-      {% endif %}
-    </div>
-  {% endfor %}
+    {% if category.products %}
+      <div class="products-container">
+        {% for product in category.products %}
+          <div class="product-card">
+            <div class="product-title">{{ product.name }}</div>
+            <div class="product-price">Ksh {{ product.price }}</div>
+            
+            <form class="add-to-cart-form" method="POST" action="{% url 'add_to_cart' %}">
+              {% csrf_token %}
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <input type="number" name="quantity" value="1" min="1" style="width: 60px;">
+              <button type="submit">Add to Cart</button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No products available in this category.</p>
+    {% endif %}
+  </div>
+{% endfor %}
 {% endblock %}

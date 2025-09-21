@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -24,6 +25,12 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # skip CSRF check
 
+@login_required
+def cart_count(request):
+    customer = request.user.customer_profile
+    order = Order.objects.filter(customer=customer, status="pending").first()
+    count = order.items.count() if order else 0
+    return JsonResponse({"cart_count": count})
 
 @require_POST
 def add_to_cart(request):
