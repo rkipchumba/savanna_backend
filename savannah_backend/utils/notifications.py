@@ -4,8 +4,8 @@ from django.conf import settings
 def get_sms_service():
     """Initialize Africa's Talking and return SMS service only (sandbox-safe)"""
     africastalking.initialize(
-        username=settings.AT_USERNAME,  # must be 'sandbox'
-        api_key=settings.AT_API_KEY     # sandbox API key
+        username=settings.AT_USERNAME,
+        api_key=settings.AT_API_KEY 
     )
     return africastalking.SMS
 

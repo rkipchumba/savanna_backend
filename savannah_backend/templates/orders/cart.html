@@ -1,41 +1,34 @@
-<h2>Your Cart</h2>
+{% extends "base.html" %}
 
-{% if items %}
-<table>
-  <tr>
-    <th>Product</th>
-    <th>Quantity</th>
-    <th>Price</th>
-    <th>Subtotal</th>
-  </tr>
-  {% for item in items %}
-  {% for item in items %}
-  <tr>
-    <td>{{ item.product.name }}</td>
-    <td>{{ item.quantity }}</td>
-    <td>{{ item.subtotal }}</td>
-  </tr>
-{% endfor %}
-<tr>
-  <td colspan="2">Total</td>
-  <td>{{ total }}</td>
-</tr>
+{% block content %}
+  <h2>Your Cart</h2>
 
-  {% endfor %}
-</table>
+  {% if items %}
+    <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+      </tr>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>Ksh {{ item.subtotal }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="2"><strong>Total</strong></td>
+        <td><strong>Ksh {{ total }}</strong></td>
+      </tr>
+    </table>
 
-<p>Total: Ksh {{ total }}</p>
+    <form method="POST" action="{% url 'checkout' %}" style="margin-top: 20px;">
+      {% csrf_token %}
+      <button type="submit">Place Order</button>
+    </form>
 
-<form method="POST" action="{% url 'checkout' %}">
-  {% csrf_token %}
-  <button type="submit">Place Order</button>
-</form>
-
-<form action="{% url 'checkout' %}" method="POST">
-    {% csrf_token %}
-    <button type="submit">Checkout</button>
-  </form>
-  
-{% else %}
-<p>Your cart is empty.</p>
-{% endif %}
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+{% endblock %}

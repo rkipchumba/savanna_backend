@@ -43,7 +43,7 @@
       .cart-badge {
         position: absolute;
         top: -8px;
-        right: -12px;
+        right: -10px;
         background: red;
         color: white;
         border-radius: 50%;
@@ -62,6 +62,28 @@
       h2 {
         color: #2c3e50;
       }
+
+      /* Toast message for AJAX feedback */
+      #toast {
+        visibility: hidden;
+        min-width: 200px;
+        background-color: #27ae60;
+        color: white;
+        text-align: center;
+        border-radius: 5px;
+        padding: 10px;
+        position: fixed;
+        z-index: 1000;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+      }
+      #toast.show {
+        visibility: visible;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+      }
+      @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+      @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
   </head>
   <body>
@@ -74,23 +96,8 @@
     
         {% if user.is_authenticated %}
         <a href="{% url 'cart_view' %}" style="position: relative; display: inline-block;">
-            🛒 Cart
-            {% with request.user.customer_profile.orders.first.items.count as cart_count %}
-                {% if cart_count %}
-                    <span style="
-                        position: absolute;
-                        top: -8px;
-                        right: -10px;
-                        background: red;
-                        color: white;
-                        border-radius: 50%;
-                        padding: 2px 6px;
-                        font-size: 12px;
-                    ">{{ cart_count }}</span>
-                {% endif %}
-            {% endwith %}
+          🛒 Cart <span id="cart-count" class="cart-badge">{% if cart_item_count %}{{ cart_item_count }}{% else %}0{% endif %}</span>
         </a>
-    
         <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
             {% csrf_token %}
             <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">
@@ -100,8 +107,7 @@
         {% else %}
         <a href="{% url 'account_login' %}">Login</a>
         {% endif %}
-    </div>
-    
+      </div>
     </nav>
 
     <div class="container">
@@ -109,5 +115,42 @@
         <p class="welcome">Welcome, <strong>{{ user.username }}</strong> 👋</p>
       {% endblock %}
     </div>
+
+    <!-- Toast message -->
+    <div id="toast">Product added to cart!</div>
+
+    <script>
+      function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'show';
+        setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+      }
+
+      // Attach AJAX add-to-cart for all forms dynamically
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+          form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const res = await fetch(form.action, {
+              method: "POST",
+              headers: { "X-CSRFToken": csrfToken },
+              body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+              const cartCountEl = document.getElementById('cart-count');
+              cartCountEl.textContent = data.cart_count;
+              showToast('Product added to cart!');
+            } else if (data.error === 'not_authenticated') {
+              window.location.href = "{% url 'account_login' %}";
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>

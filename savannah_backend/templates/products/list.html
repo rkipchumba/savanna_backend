@@ -52,6 +52,20 @@
       color: #27ae60;
       margin-bottom: 6px;
     }
+
+    .product-card button {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .product-card button:hover {
+      background-color: #219150;
+    }
   </style>
 
   <h1>Products by Category</h1>
@@ -65,17 +79,17 @@
       {% if category.products %}
         <div class="products-container">
           {% for product in category.products %}
-          <div class="product-card">
-            <div class="product-title">{{ product.name }}</div>
-            <div class="product-price">Ksh {{ product.price }}</div>
-          
-            <form class="add-to-cart-form" method="POST" action="{% url 'add_to_cart' %}">
-              {% csrf_token %}
-              <input type="hidden" name="product_id" value="{{ product.id }}">
-              <input type="number" name="quantity" value="1" min="1" style="width: 60px;">
-              <button type="submit">Add to Cart</button>
-            </form>
-          </div>          
+            <div class="product-card">
+              <div class="product-title">{{ product.name }}</div>
+              <div class="product-price">Ksh {{ product.price }}</div>
+              
+              <form class="add-to-cart-form" method="POST" action="{% url 'add_to_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <input type="number" name="quantity" value="1" min="1" style="width: 60px;">
+                <button type="submit">Add to Cart</button>
+              </form>
+            </div>
           {% endfor %}
         </div>
       {% else %}
