@@ -108,15 +108,17 @@ REST_FRAMEWORK = {
 
 # Django Allauth settings
 SITE_ID = 1
-ACCOUNT_EMAIL_VERIFICATION = "none"   # or "mandatory" if you need email checks
-
-ACCOUNT_LOGIN_METHODS = {"username"}  
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+SOCIALACCOUNT_AUTO_SIGNUP = True 
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+
+
 
 
 # Tell dj-rest-auth to use allauth
 REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "customers.serializers.CustomerSerializer",  # optional, my custom user serializer
+    "USER_DETAILS_SERIALIZER": "customers.serializers.CustomerSerializer",
 }
 
 
