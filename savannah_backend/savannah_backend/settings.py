@@ -1,10 +1,10 @@
-"""
-Django settings for savannah_backend project.
-"""
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 import warnings
 
+# Load environment variables
+load_dotenv()  # make sure python-dotenv is installed
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -13,12 +13,14 @@ warnings.filterwarnings(
     message=".*app_settings.(USERNAME_REQUIRED|EMAIL_REQUIRED) is deprecated.*"
 )
 
-SECRET_KEY = 'django-insecure-(63rurtw#p9#tz#8%9^n=vi^8h=+6e8yz003cagxswo$3=fqsr'
-DEBUG = True
-ALLOWED_HOSTS = []
+# Secret key
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
-AT_USERNAME = "sandbox"
-AT_API_KEY = "atsk_ee8686925336242625cb7455e1a780838508c71cbceca1364e521cb5ca2c6151d71553f0"
+
+AT_USERNAME = os.getenv('AT_USERNAME')
+AT_API_KEY =  os.getenv('AT_API_KEY')
 
 
 # Application definition
@@ -83,14 +85,15 @@ WSGI_APPLICATION = 'savannah_backend.wsgi.application'
 
 
 # Database
+# Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'savannah_db',
-        'USER': 'savannah_user',
-        'PASSWORD': 'savannah_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -142,16 +145,16 @@ STATIC_URL = 'static/'
 # Default PK type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Google OAuth2
-GOOGLE_CALLBACK_URL = "http://127.0.0.1:8000/auth/google/callback/"
-LOGIN_REDIRECT_URL = '/products/'  
-LOGOUT_REDIRECT_URL = '/products/'
+GOOGLE_CALLBACK_URL = os.getenv('GOOGLE_CALLBACK_URL')
+LOGIN_REDIRECT_URL = os.getenv('LOGIN_REDIRECT_URL')
+LOGOUT_REDIRECT_URL = os.getenv('LOGOUT_REDIRECT_URL')
 
 # Email configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "kipchumbarodgers@gmail.com"
-EMAIL_HOST_PASSWORD = "trzk fnpx lykr zudo"
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+
