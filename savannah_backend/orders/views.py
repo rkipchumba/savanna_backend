@@ -236,23 +236,37 @@ def remove_cart_item(request):
         "cart_count": cart_count  # <-- add this
     })
 
-    if not request.user.is_authenticated:
-        return JsonResponse({"error": "not_authenticated"}, status=401)
+    # if not request.user.is_authenticated:
+    #     return JsonResponse({"error": "not_authenticated"}, status=401)
 
-    data = json.loads(request.body)
-    item_id = data.get("item_id")
-    item = get_object_or_404(
-        OrderItem,
-        id=item_id,
-        order__customer=request.user.customer_profile,
-        order__status="pending"
-    )
-    order = item.order
-    item.delete()
+    # data = json.loads(request.body)
+    # item_id = data.get("item_id")
+    # item = get_object_or_404(
+    #     OrderItem,
+    #     id=item_id,
+    #     order__customer=request.user.customer_profile,
+    #     order__status="pending"
+    # )
+    # order = item.order
+    # item.delete()
 
-    total = sum(i.product.price * i.quantity for i in order.items.all())
+    # total = sum(i.product.price * i.quantity for i in order.items.all())
 
-    return JsonResponse({
-        "success": True,
-        "total": int(total)
-    })
+    # return JsonResponse({
+    #     "success": True,
+    #     "total": int(total)
+    # })
+
+@login_required
+def orders_list(request):
+    """Display all completed orders for the current user."""
+    customer = request.user.customer_profile
+    orders = Order.objects.filter(customer=customer, status="completed").prefetch_related("items__product")
+    
+    # Optionally, compute totals for each order
+    orders_data = []
+    for order in orders:
+        total = sum(int(item.product.price * item.quantity) for item in order.items.all())
+        orders_data.append({"order": order, "total": total})
+
+    return render(request, "orders/orders_list.html", {"orders_data": orders_data})

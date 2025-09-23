@@ -1,7 +1,14 @@
 # Python cache
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
+
+# Django
+*.sqlite3
+*.log
+media/
+staticfiles/
 
 # Distribution / packaging
 build/
@@ -46,7 +53,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-
 # Environments
 .env
 .env.*
@@ -58,12 +64,10 @@ coverage.xml
 *.swp
 *.swo
 
-# Mypy
+# Type checkers
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pyre type checker
 .pyre/
 
 # Pylint

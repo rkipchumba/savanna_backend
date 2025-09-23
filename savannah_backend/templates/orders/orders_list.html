@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<h1 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">My Orders</h1>
+
+{% if orders_data %}
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    {% for data in orders_data %}
+      <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-weight: bold; font-size: 18px;">Order #{{ data.order.id }}</span>
+          <span style="font-weight: bold; color: #27ae60;">Total: Ksh {{ data.total }}</span>
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #ecf0f1; text-align: left;">
+              <th style="padding: 8px; border-bottom: 1px solid #bdc3c7;">Product</th>
+              <th style="padding: 8px; border-bottom: 1px solid #bdc3c7;">Quantity</th>
+              <th style="padding: 8px; border-bottom: 1px solid #bdc3c7;">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in data.order.items.all %}
+            <tr>
+              <td style="padding: 8px; border-bottom: 1px solid #ecf0f1;">{{ item.product.name }}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #ecf0f1;">{{ item.quantity }}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #ecf0f1;">Ksh {{ item.product.price }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p style="text-align: center; color: #7f8c8d; font-size: 16px;">You have no completed orders.</p>
+{% endif %}
+{% endblock %}
