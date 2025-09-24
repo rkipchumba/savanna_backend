@@ -83,8 +83,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'savannah_backend.wsgi.application'
 
-
-# Database
 # Database
 DATABASES = {
     'default': {
